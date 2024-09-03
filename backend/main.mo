@@ -17,10 +17,22 @@ actor {
     completedAt: ?Time.Time;
   };
 
+  // Define the Category type with icon
+  type Category = {
+    name: Text;
+    icon: Text;
+  };
+
   // Stable variables
   stable var taskId: Nat = 0;
   stable var tasks: [Task] = [];
-  stable var defaultCategories: [Text] = ["Work", "Personal", "Shopping", "Health", "Finance"];
+  stable var defaultCategories: [Category] = [
+    { name = "Work"; icon = "briefcase" },
+    { name = "Personal"; icon = "user" },
+    { name = "Shopping"; icon = "shopping-cart" },
+    { name = "Health"; icon = "heart" },
+    { name = "Finance"; icon = "dollar-sign" }
+  ];
 
   // Add a new task with category
   public func addTask(description: Text, category: Text) : async Nat {
@@ -72,10 +84,10 @@ actor {
   };
 
   // Get all categories (default + user-created)
-  public query func getCategories() : async [Text] {
-    let userCategories = Array.foldLeft<Task, [Text]>(tasks, [], func (acc, task) {
-      if (Array.find<Text>(acc, func (cat) { cat == task.category }) == null) {
-        Array.append(acc, [task.category])
+  public query func getCategories() : async [Category] {
+    let userCategories = Array.foldLeft<Task, [Category]>(tasks, [], func (acc, task) {
+      if (Array.find<Category>(acc, func (cat) { cat.name == task.category }) == null) {
+        Array.append(acc, [{ name = task.category; icon = "tag" }])
       } else {
         acc
       }
@@ -84,7 +96,7 @@ actor {
   };
 
   // Get default categories
-  public query func getDefaultCategories() : async [Text] {
+  public query func getDefaultCategories() : async [Category] {
     defaultCategories
   };
 }

@@ -11,9 +11,14 @@ interface Task {
   completedAt: bigint | null;
 }
 
+interface Category {
+  name: string;
+  icon: string;
+}
+
 const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [newTask, setNewTask] = useState('');
   const [newCategory, setNewCategory] = useState('');
   const [loading, setLoading] = useState(false);
@@ -23,6 +28,11 @@ const App: React.FC = () => {
     fetchTasks();
     fetchCategories();
   }, []);
+
+  useEffect(() => {
+    // @ts-ignore
+    feather.replace();
+  }, [categories]);
 
   const fetchTasks = async () => {
     setLoading(true);
@@ -88,21 +98,23 @@ const App: React.FC = () => {
     <div className="container mx-auto p-4 max-w-6xl">
       <h1 className="text-3xl font-bold mb-4 text-center text-blue-600">Task List</h1>
       <div className="flex">
-        <div className="w-1/4 pr-4">
+        <div className="w-1/3 pr-4">
           <h2 className="text-xl font-semibold mb-2">Categories</h2>
           <List>
             <ListItem button onClick={() => setSelectedCategory('all')}>
+              <i data-feather="list" className="mr-2"></i>
               <ListItemText primary="All" />
             </ListItem>
             {categories.map((category) => (
-              <ListItem button key={category} onClick={() => setSelectedCategory(category)}>
-                <i data-feather="folder" className="mr-2"></i>
-                <ListItemText primary={category} />
+              <ListItem button key={category.name} onClick={() => setSelectedCategory(category.name)}>
+                <i data-feather={category.icon} className="mr-2"></i>
+                <ListItemText primary={category.name} />
               </ListItem>
             ))}
           </List>
         </div>
-        <div className="w-3/4">
+        <div className="w-2/3">
+          <h2 className="text-xl font-semibold mb-2">Create Task</h2>
           <div className="mb-4">
             <TextField
               fullWidth
@@ -120,7 +132,7 @@ const App: React.FC = () => {
                 label="Category"
               >
                 {categories.map((category) => (
-                  <MenuItem key={category} value={category}>{category}</MenuItem>
+                  <MenuItem key={category.name} value={category.name}>{category.name}</MenuItem>
                 ))}
               </Select>
             </FormControl>
@@ -140,6 +152,7 @@ const App: React.FC = () => {
               <CircularProgress />
             </div>
           )}
+          <h2 className="text-xl font-semibold mb-2">Tasks</h2>
           <List>
             {filteredTasks.map((task) => (
               <ListItem key={Number(task.id)} className={task.completed ? 'bg-gray-100' : ''}>

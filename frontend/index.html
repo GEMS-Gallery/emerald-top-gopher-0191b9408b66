@@ -10,7 +10,9 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
     <script>
-      feather.replace();
+      document.addEventListener('DOMContentLoaded', (event) => {
+        feather.replace();
+      });
     </script>
   </body>
 </html>

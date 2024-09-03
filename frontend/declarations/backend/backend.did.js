@@ -1,4 +1,5 @@
 export const idlFactory = ({ IDL }) => {
+  const Category = IDL.Record({ 'icon' : IDL.Text, 'name' : IDL.Text });
   const Time = IDL.Int;
   const Task = IDL.Record({
     'id' : IDL.Nat,
@@ -11,8 +12,8 @@ export const idlFactory = ({ IDL }) => {
     'addTask' : IDL.Func([IDL.Text, IDL.Text], [IDL.Nat], []),
     'completeTask' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'deleteTask' : IDL.Func([IDL.Nat], [IDL.Bool], []),
-    'getCategories' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
-    'getDefaultCategories' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
+    'getCategories' : IDL.Func([], [IDL.Vec(Category)], ['query']),
+    'getDefaultCategories' : IDL.Func([], [IDL.Vec(Category)], ['query']),
     'getTasks' : IDL.Func([], [IDL.Vec(Task)], ['query']),
   });
 };

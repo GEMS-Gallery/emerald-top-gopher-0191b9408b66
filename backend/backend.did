@@ -7,11 +7,16 @@ type Task =
    description: text;
    id: nat;
  };
+type Category = 
+ record {
+   icon: text;
+   name: text;
+ };
 service : {
   addTask: (text, text) -> (nat);
   completeTask: (nat) -> (bool);
   deleteTask: (nat) -> (bool);
-  getCategories: () -> (vec text) query;
-  getDefaultCategories: () -> (vec text) query;
+  getCategories: () -> (vec Category) query;
+  getDefaultCategories: () -> (vec Category) query;
   getTasks: () -> (vec Task) query;
 }
