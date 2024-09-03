@@ -7,12 +7,14 @@ export interface Task {
   'completedAt' : [] | [Time],
   'completed' : boolean,
   'description' : string,
+  'category' : string,
 }
 export type Time = bigint;
 export interface _SERVICE {
-  'addTask' : ActorMethod<[string], bigint>,
+  'addTask' : ActorMethod<[string, string], bigint>,
   'completeTask' : ActorMethod<[bigint], boolean>,
   'deleteTask' : ActorMethod<[bigint], boolean>,
+  'getCategories' : ActorMethod<[], Array<string>>,
   'getTasks' : ActorMethod<[], Array<Task>>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;

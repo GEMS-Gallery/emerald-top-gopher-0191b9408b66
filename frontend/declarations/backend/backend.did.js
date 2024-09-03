@@ -5,11 +5,13 @@ export const idlFactory = ({ IDL }) => {
     'completedAt' : IDL.Opt(Time),
     'completed' : IDL.Bool,
     'description' : IDL.Text,
+    'category' : IDL.Text,
   });
   return IDL.Service({
-    'addTask' : IDL.Func([IDL.Text], [IDL.Nat], []),
+    'addTask' : IDL.Func([IDL.Text, IDL.Text], [IDL.Nat], []),
     'completeTask' : IDL.Func([IDL.Nat], [IDL.Bool], []),
     'deleteTask' : IDL.Func([IDL.Nat], [IDL.Bool], []),
+    'getCategories' : IDL.Func([], [IDL.Vec(IDL.Text)], ['query']),
     'getTasks' : IDL.Func([], [IDL.Vec(Task)], ['query']),
   });
 };

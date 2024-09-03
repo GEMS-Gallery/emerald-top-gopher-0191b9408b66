@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { backend } from 'declarations/backend';
-import { TextField, Button, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Checkbox, CircularProgress } from '@mui/material';
+import { TextField, Button, List, ListItem, ListItemText, ListItemSecondaryAction, IconButton, Checkbox, CircularProgress, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import { Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
 
 interface Task {
   id: bigint;
   description: string;
+  category: string;
   completed: boolean;
   completedAt: bigint | null;
 }
 
 const App: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [newTask, setNewTask] = useState('');
+  const [newCategory, setNewCategory] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('all');
 
   useEffect(() => {
     fetchTasks();
+    fetchCategories();
   }, []);
 
   const fetchTasks = async () => {
@@ -30,13 +35,24 @@ const App: React.FC = () => {
     setLoading(false);
   };
 
+  const fetchCategories = async () => {
+    try {
+      const fetchedCategories = await backend.getCategories();
+      setCategories(fetchedCategories);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
   const addTask = async () => {
-    if (newTask.trim() === '') return;
+    if (newTask.trim() === '' || newCategory.trim() === '') return;
     setLoading(true);
     try {
-      await backend.addTask(newTask);
+      await backend.addTask(newTask, newCategory);
       setNewTask('');
+      setNewCategory('');
       await fetchTasks();
+      await fetchCategories();
     } catch (error) {
       console.error('Error adding task:', error);
     }
@@ -59,64 +75,94 @@ const App: React.FC = () => {
     try {
       await backend.deleteTask(id);
       await fetchTasks();
+      await fetchCategories();
     } catch (error) {
       console.error('Error deleting task:', error);
     }
     setLoading(false);
   };
 
+  const filteredTasks = selectedCategory === 'all' ? tasks : tasks.filter(task => task.category === selectedCategory);
+
   return (
-    <div className="container mx-auto p-4 max-w-md">
+    <div className="container mx-auto p-4 max-w-4xl">
       <h1 className="text-3xl font-bold mb-4 text-center text-blue-600">Task List</h1>
       <div className="flex mb-4">
-        <TextField
-          fullWidth
-          variant="outlined"
-          value={newTask}
-          onChange={(e) => setNewTask(e.target.value)}
-          placeholder="Enter a new task"
-          className="mr-2"
-        />
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={addTask}
-          startIcon={<AddIcon />}
-          disabled={loading}
-        >
-          Add
-        </Button>
-      </div>
-      {loading && (
-        <div className="flex justify-center my-4">
-          <CircularProgress />
+        <div className="w-1/4 pr-4">
+          <h2 className="text-xl font-semibold mb-2">Categories</h2>
+          <List>
+            <ListItem button onClick={() => setSelectedCategory('all')}>
+              <ListItemText primary="All" />
+            </ListItem>
+            {categories.map((category) => (
+              <ListItem button key={category} onClick={() => setSelectedCategory(category)}>
+                <i data-feather="folder" className="mr-2"></i>
+                <ListItemText primary={category} />
+              </ListItem>
+            ))}
+          </List>
         </div>
-      )}
-      <List>
-        {tasks.map((task) => (
-          <ListItem key={Number(task.id)} className={task.completed ? 'bg-gray-100' : ''}>
-            <Checkbox
-              checked={task.completed}
-              onChange={() => completeTask(task.id)}
+        <div className="w-3/4">
+          <div className="flex mb-4">
+            <TextField
+              fullWidth
+              variant="outlined"
+              value={newTask}
+              onChange={(e) => setNewTask(e.target.value)}
+              placeholder="Enter a new task"
+              className="mr-2"
+            />
+            <TextField
+              fullWidth
+              variant="outlined"
+              value={newCategory}
+              onChange={(e) => setNewCategory(e.target.value)}
+              placeholder="Enter category"
+              className="mr-2"
+            />
+            <Button
+              variant="contained"
               color="primary"
-            />
-            <ListItemText
-              primary={task.description}
-              className={task.completed ? 'line-through text-gray-500' : ''}
-            />
-            <ListItemSecondaryAction>
-              <IconButton
-                edge="end"
-                aria-label="delete"
-                onClick={() => deleteTask(task.id)}
-                disabled={loading}
-              >
-                <DeleteIcon color="error" />
-              </IconButton>
-            </ListItemSecondaryAction>
-          </ListItem>
-        ))}
-      </List>
+              onClick={addTask}
+              startIcon={<AddIcon />}
+              disabled={loading}
+            >
+              Add
+            </Button>
+          </div>
+          {loading && (
+            <div className="flex justify-center my-4">
+              <CircularProgress />
+            </div>
+          )}
+          <List>
+            {filteredTasks.map((task) => (
+              <ListItem key={Number(task.id)} className={task.completed ? 'bg-gray-100' : ''}>
+                <Checkbox
+                  checked={task.completed}
+                  onChange={() => completeTask(task.id)}
+                  color="primary"
+                />
+                <ListItemText
+                  primary={task.description}
+                  secondary={task.category}
+                  className={task.completed ? 'line-through text-gray-500' : ''}
+                />
+                <ListItemSecondaryAction>
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => deleteTask(task.id)}
+                    disabled={loading}
+                  >
+                    <DeleteIcon color="error" />
+                  </IconButton>
+                </ListItemSecondaryAction>
+              </ListItem>
+            ))}
+          </List>
+        </div>
+      </div>
     </div>
   );
 };

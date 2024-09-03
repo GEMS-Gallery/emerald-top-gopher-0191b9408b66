@@ -8,10 +8,11 @@ import Result "mo:base/Result";
 import Option "mo:base/Option";
 
 actor {
-  // Define the Task type
+  // Define the Task type with category
   type Task = {
     id: Nat;
     description: Text;
+    category: Text;
     completed: Bool;
     completedAt: ?Time.Time;
   };
@@ -20,11 +21,12 @@ actor {
   stable var taskId: Nat = 0;
   stable var tasks: [Task] = [];
 
-  // Add a new task
-  public func addTask(description: Text) : async Nat {
+  // Add a new task with category
+  public func addTask(description: Text, category: Text) : async Nat {
     let newTask: Task = {
       id = taskId;
       description = description;
+      category = category;
       completed = false;
       completedAt = null;
     };
@@ -40,6 +42,7 @@ actor {
         {
           id = task.id;
           description = task.description;
+          category = task.category;
           completed = true;
           completedAt = ?Time.now();
         }
@@ -65,5 +68,17 @@ actor {
   // Get all tasks
   public query func getTasks() : async [Task] {
     tasks
+  };
+
+  // Get unique categories
+  public query func getCategories() : async [Text] {
+    let categorySet = Array.foldLeft<Task, [Text]>(tasks, [], func (acc, task) {
+      if (Array.find<Text>(acc, func (cat) { cat == task.category }) == null) {
+        Array.append(acc, [task.category])
+      } else {
+        acc
+      }
+    });
+    categorySet
   };
 }

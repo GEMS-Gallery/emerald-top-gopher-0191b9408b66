@@ -6,3 +6,13 @@ body {
   font-family: 'Roboto', sans-serif;
   background-color: #f5f5f5;
 }
+
+.feather {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
