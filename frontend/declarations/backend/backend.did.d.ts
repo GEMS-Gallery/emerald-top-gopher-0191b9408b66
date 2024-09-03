@@ -15,6 +15,7 @@ export interface _SERVICE {
   'completeTask' : ActorMethod<[bigint], boolean>,
   'deleteTask' : ActorMethod<[bigint], boolean>,
   'getCategories' : ActorMethod<[], Array<string>>,
+  'getDefaultCategories' : ActorMethod<[], Array<string>>,
   'getTasks' : ActorMethod<[], Array<Task>>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;

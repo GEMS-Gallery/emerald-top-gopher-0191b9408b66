@@ -20,6 +20,7 @@ actor {
   // Stable variables
   stable var taskId: Nat = 0;
   stable var tasks: [Task] = [];
+  stable var defaultCategories: [Text] = ["Work", "Personal", "Shopping", "Health", "Finance"];
 
   // Add a new task with category
   public func addTask(description: Text, category: Text) : async Nat {
@@ -70,15 +71,20 @@ actor {
     tasks
   };
 
-  // Get unique categories
+  // Get all categories (default + user-created)
   public query func getCategories() : async [Text] {
-    let categorySet = Array.foldLeft<Task, [Text]>(tasks, [], func (acc, task) {
+    let userCategories = Array.foldLeft<Task, [Text]>(tasks, [], func (acc, task) {
       if (Array.find<Text>(acc, func (cat) { cat == task.category }) == null) {
         Array.append(acc, [task.category])
       } else {
         acc
       }
     });
-    categorySet
+    Array.append(defaultCategories, userCategories)
+  };
+
+  // Get default categories
+  public query func getDefaultCategories() : async [Text] {
+    defaultCategories
   };
 }

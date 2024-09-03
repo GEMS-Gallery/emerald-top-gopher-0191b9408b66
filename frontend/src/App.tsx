@@ -45,7 +45,7 @@ const App: React.FC = () => {
   };
 
   const addTask = async () => {
-    if (newTask.trim() === '' || newCategory.trim() === '') return;
+    if (newTask.trim() === '' || newCategory === '') return;
     setLoading(true);
     try {
       await backend.addTask(newTask, newCategory);
@@ -85,9 +85,9 @@ const App: React.FC = () => {
   const filteredTasks = selectedCategory === 'all' ? tasks : tasks.filter(task => task.category === selectedCategory);
 
   return (
-    <div className="container mx-auto p-4 max-w-4xl">
+    <div className="container mx-auto p-4 max-w-6xl">
       <h1 className="text-3xl font-bold mb-4 text-center text-blue-600">Task List</h1>
-      <div className="flex mb-4">
+      <div className="flex">
         <div className="w-1/4 pr-4">
           <h2 className="text-xl font-semibold mb-2">Categories</h2>
           <List>
@@ -103,31 +103,36 @@ const App: React.FC = () => {
           </List>
         </div>
         <div className="w-3/4">
-          <div className="flex mb-4">
+          <div className="mb-4">
             <TextField
               fullWidth
               variant="outlined"
               value={newTask}
               onChange={(e) => setNewTask(e.target.value)}
               placeholder="Enter a new task"
-              className="mr-2"
+              className="mb-2"
             />
-            <TextField
-              fullWidth
-              variant="outlined"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-              placeholder="Enter category"
-              className="mr-2"
-            />
+            <FormControl fullWidth variant="outlined" className="mb-2">
+              <InputLabel>Category</InputLabel>
+              <Select
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value as string)}
+                label="Category"
+              >
+                {categories.map((category) => (
+                  <MenuItem key={category} value={category}>{category}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <Button
+              fullWidth
               variant="contained"
               color="primary"
               onClick={addTask}
               startIcon={<AddIcon />}
               disabled={loading}
             >
-              Add
+              Add Task
             </Button>
           </div>
           {loading && (
